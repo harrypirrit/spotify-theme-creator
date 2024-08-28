@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 export interface ThemeOptions {
   background: string;
@@ -7,18 +7,31 @@ export interface ThemeOptions {
   notifications: string;
 }
 
+interface ThemeOptionProps {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+interface ThemeOptionsPaneProps {
+  isOpen: boolean;
+  themeOptions: ThemeOptions;
+  onThemeChange: (option: keyof ThemeOptions, value: string) => void;
+  onGenerateTheme: (title: string, theme: ThemeOptions) => void;
+}
+
+interface ModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: (title: string) => void;
+}
+
 export const defaultTheme: ThemeOptions = {
   background: "#030303",
   cards: "#272727",
   textButtons: "#FFFFFF",
   notifications: "#66D36E",
 };
-
-interface ThemeOptionProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}
 
 const ThemeOption: React.FC<ThemeOptionProps> = ({
   label,
@@ -58,17 +71,65 @@ const ThemeOption: React.FC<ThemeOptionProps> = ({
   );
 };
 
-interface ThemeOptionsPaneProps {
-  isOpen: boolean;
-  themeOptions: ThemeOptions;
-  onThemeChange: (option: keyof ThemeOptions, value: string) => void;
-}
+const Modal: React.FC<ModalProps> = ({ isOpen, onClose, onConfirm }) => {
+  const [title, setTitle] = useState("");
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg shadow-lg">
+        <h3 className="text-lg font-semibold mb-4">
+          What would you like to name your theme?
+        </h3>
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 mb-4"
+          placeholder="Enter theme title"
+        />
+        <div className="flex justify-end space-x-2">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors duration-300"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={() => {
+              if (title.trim()) {
+                onConfirm(title);
+                setTitle("");
+              }
+            }}
+            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors duration-300"
+          >
+            Generate
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export const ThemeOptionsPane: React.FC<ThemeOptionsPaneProps> = ({
   isOpen,
   themeOptions,
   onThemeChange,
+  onGenerateTheme,
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleGenerateTheme = (title: string) => {
+    if (title.trim()) {
+      onGenerateTheme(title, themeOptions);
+      setIsModalOpen(false);
+    } else {
+      alert("Please enter a theme title before generating.");
+    }
+  };
+
   return (
     <div
       className={`${
@@ -87,7 +148,18 @@ export const ThemeOptionsPane: React.FC<ThemeOptionsPaneProps> = ({
             />
           )
         )}
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors duration-300"
+        >
+          Generate Theme
+        </button>
       </div>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onConfirm={handleGenerateTheme}
+      />
     </div>
   );
 };

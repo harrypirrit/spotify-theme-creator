@@ -33,6 +33,9 @@ const ContentLayout: React.FC = () => {
         isOpen={isLeftPaneOpen}
         themeOptions={themeOptions}
         onThemeChange={handleThemeOptionChange}
+        onGenerateTheme={function (title: string, theme: ThemeOptions): void {
+          throw new Error("Function not implemented.");
+        }}
       />
 
       <button
