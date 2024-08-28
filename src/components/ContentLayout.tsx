@@ -1,8 +1,23 @@
 import React, { useState } from "react";
+import { ThemeOptionsPane, ThemeOptions, defaultTheme } from "./ThemeOptions";
+
+const useTheme = () => {
+  const [themeOptions, setThemeOptions] = useState<ThemeOptions>(defaultTheme);
+
+  const handleThemeOptionChange = (
+    option: keyof ThemeOptions,
+    value: string
+  ) => {
+    setThemeOptions((prev) => ({ ...prev, [option]: value }));
+  };
+
+  return { themeOptions, handleThemeOptionChange };
+};
 
 const ContentLayout: React.FC = () => {
   const [isLeftPaneOpen, setIsLeftPaneOpen] = useState(true);
   const [isRightPaneOpen, setIsRightPaneOpen] = useState(false);
+  const { themeOptions, handleThemeOptionChange } = useTheme();
 
   const getMiddlePaneWidth = () => {
     let width = 100;
@@ -14,15 +29,11 @@ const ContentLayout: React.FC = () => {
   return (
     <div className="flex h-[calc(100vh-3rem)] relative">
       {/* (Theme Options pane) */}
-      <div
-        className={`${
-          isLeftPaneOpen ? "w-[19.17%]" : "w-0"
-        } bg-gray-100 transition-all duration-300 ease-in-out overflow-hidden`}
-      >
-        <div className="p-4 pl-8">
-          <h2 className="font-semibold mb-4">Theme Options</h2>
-        </div>
-      </div>
+      <ThemeOptionsPane
+        isOpen={isLeftPaneOpen}
+        themeOptions={themeOptions}
+        onThemeChange={handleThemeOptionChange}
+      />
 
       <button
         onClick={() => setIsLeftPaneOpen(!isLeftPaneOpen)}
