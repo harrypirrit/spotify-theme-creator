@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { generateTheme } from "../generateTheme";
 
 export interface ThemeOptions {
   background: string;
@@ -17,7 +18,7 @@ interface ThemeOptionsPaneProps {
   isOpen: boolean;
   themeOptions: ThemeOptions;
   onThemeChange: (option: keyof ThemeOptions, value: string) => void;
-  onGenerateTheme: (title: string, theme: ThemeOptions) => void;
+  onGenerateTheme: (title: string, ini: string, css: string) => void;
 }
 
 interface ModalProps {
@@ -123,7 +124,8 @@ export const ThemeOptionsPane: React.FC<ThemeOptionsPaneProps> = ({
 
   const handleGenerateTheme = (title: string) => {
     if (title.trim()) {
-      onGenerateTheme(title, themeOptions);
+      const { ini, css } = generateTheme(title, themeOptions);
+      onGenerateTheme(title, ini, css);
       setIsModalOpen(false);
     } else {
       alert("Please enter a theme title before generating.");
