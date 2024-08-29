@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { generateTheme } from "../generateTheme";
+import saveAs from "file-saver";
+import JSZip from "jszip";
 
 export interface ThemeOptions {
   background: string;
@@ -18,7 +20,6 @@ interface ThemeOptionsPaneProps {
   isOpen: boolean;
   themeOptions: ThemeOptions;
   onThemeChange: (option: keyof ThemeOptions, value: string) => void;
-  onGenerateTheme: (title: string, ini: string, css: string) => void;
 }
 
 interface ModalProps {
@@ -118,18 +119,26 @@ export const ThemeOptionsPane: React.FC<ThemeOptionsPaneProps> = ({
   isOpen,
   themeOptions,
   onThemeChange,
-  onGenerateTheme,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleGenerateTheme = (title: string) => {
-    if (title.trim()) {
-      const { ini, css } = generateTheme(title, themeOptions);
-      onGenerateTheme(title, ini, css);
-      setIsModalOpen(false);
-    } else {
-      alert("Please enter a theme title before generating.");
-    }
+  const handleGenerateTheme = async (
+    title: string,
+    themeOptions: ThemeOptions
+  ) => {
+    // Generate the theme files
+    const { ini, css } = generateTheme(title, themeOptions);
+    const zip = new JSZip();
+    zip.file("color.ini", ini);
+    zip.file("user.css", css);
+
+    const content = await zip.generateAsync({ type: "blob" });
+    saveAs(content, `${title.replace(/\s+/g, "_")}.zip`);
+  };
+
+  const handleGenerateThemeClick = (title: string) => {
+    handleGenerateTheme(title, themeOptions);
+    setIsModalOpen(false);
   };
 
   return (
@@ -160,7 +169,7 @@ export const ThemeOptionsPane: React.FC<ThemeOptionsPaneProps> = ({
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onConfirm={handleGenerateTheme}
+        onConfirm={handleGenerateThemeClick}
       />
     </div>
   );

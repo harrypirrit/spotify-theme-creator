@@ -1,8 +1,5 @@
 import React, { useState } from "react";
 import { ThemeOptionsPane, ThemeOptions, defaultTheme } from "./ThemeOptions";
-import { generateTheme } from "../generateTheme";
-import JSZip from "jszip";
-import { saveAs } from "file-saver";
 
 const useTheme = () => {
   const [themeOptions, setThemeOptions] = useState<ThemeOptions>(defaultTheme);
@@ -29,17 +26,6 @@ const ContentLayout: React.FC = () => {
     return `${width}%`;
   };
 
-  const handleGenerateTheme = async (title: string) => {
-    // Generate the theme files
-    const { ini, css } = generateTheme(title, themeOptions);
-    const zip = new JSZip();
-    zip.file("color.ini", ini);
-    zip.file("user.css", css);
-
-    const content = await zip.generateAsync({ type: "blob" });
-    saveAs(content, `${title.replace(/\s+/g, "_")}.zip`);
-  };
-
   return (
     <div className="flex h-[calc(100vh-3rem)] relative">
       {/* (Theme Options pane) */}
@@ -47,7 +33,6 @@ const ContentLayout: React.FC = () => {
         isOpen={isLeftPaneOpen}
         themeOptions={themeOptions}
         onThemeChange={handleThemeOptionChange}
-        onGenerateTheme={handleGenerateTheme}
       />
 
       <button
