@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { ThemeOptionsPane, ThemeOptions, defaultTheme } from "./ThemeOptions";
+import AlbumSearch from "./AlbumSearch";
 
 const useTheme = () => {
   const [themeOptions, setThemeOptions] = useState<ThemeOptions>(defaultTheme);
@@ -56,10 +57,11 @@ const ContentLayout: React.FC = () => {
       <div
         className={`${
           isRightPaneOpen ? "w-[24.96%]" : "w-0"
-        } bg-gray-100 transition-all duration-300 ease-in-out overflow-hidden`}
+        } bg-gray-100 transition-all duration-300 ease-in-out overflow-hidden items-center`}
       >
         <div className="p-4 pr-8">
-          <h2 className="font-semibold mb-4">Album Search</h2>
+          <h2 className="font-semibold mb-4 text-center">Album Search</h2>
+          <AlbumSearch></AlbumSearch>
         </div>
       </div>
 
